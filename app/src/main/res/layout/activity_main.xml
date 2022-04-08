@@ -17,15 +17,32 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.lj.wiget.letterlib.LetterIndexView
-        android:id="@+id/letter_id"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
-        android:background="@color/design_default_color_secondary"
-        android:paddingVertical="20dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/tv_letter_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/icon_letter_trip"
+            android:gravity="center"
+            android:paddingRight="8dp"
+            android:textColor="@color/white"
+            android:textSize="32dp"
+            android:visibility="gone" />
 
+        <com.lj.wiget.letterlib.LetterIndexView
+            android:id="@+id/letter_id"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:background="@color/design_default_color_secondary"
+            android:paddingVertical="20dp" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

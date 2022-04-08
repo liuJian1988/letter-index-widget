@@ -19,6 +19,9 @@ import java.util.List;
  * @author： LJ
  * @data: 2022/04/06
  * @email： 1187502892@qq.com
+ *
+ * 控件编写的难点：
+ * 1、如何是文字剧中显示：https://www.cnblogs.com/tianzhijiexian/p/4297664.html
  */
 public class LetterIndexView extends View {
     /**
@@ -274,6 +277,9 @@ public class LetterIndexView extends View {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                if (mLetterSelectedListener != null) {
+                    mLetterSelectedListener.onLetterUp();
+                }
                 break;
         }
         return true;
@@ -287,7 +293,7 @@ public class LetterIndexView extends View {
                 if (mCurrentSelectedLetterPosition != letterPosition) {
                     if (mLetterSelectedListener != null) {
                         mLetterSelectedListener.onLetterSelectedChange(mCurrentSelectedLetterPosition != null ? mCurrentSelectedLetterPosition.letter : ""
-                                , letterPosition.letter, i);
+                                , letterPosition.letter, i, letterPosition.centerY);
                     }
                     mCurrentSelectedLetterPosition = letterPosition;
                     postInvalidateOnAnimation();
@@ -304,7 +310,9 @@ public class LetterIndexView extends View {
 
 
     public interface OnLetterSelectedListener {
-        void onLetterSelectedChange(String oldLetter, String newLetter, int index);
+        void onLetterSelectedChange(String oldLetter, String newLetter, int index, double centerY);
+
+        void onLetterUp();
     }
 
     private static class LetterPosition {
