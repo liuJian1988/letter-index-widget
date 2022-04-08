@@ -21,7 +21,7 @@ import java.util.List;
  * @email： 1187502892@qq.com
  *
  * 控件编写的难点：
- * 1、如何是文字剧中显示：https://www.cnblogs.com/tianzhijiexian/p/4297664.html
+ * 1、如何是文字居中显示：https://www.cnblogs.com/tianzhijiexian/p/4297664.html
  */
 public class LetterIndexView extends View {
     /**
