@@ -19,7 +19,7 @@ import java.util.List;
  * @author： LJ
  * @data: 2022/04/06
  * @email： 1187502892@qq.com
- *
+ * <p>
  * 控件编写的难点：
  * 1、如何是文字居中显示：https://www.cnblogs.com/tianzhijiexian/p/4297664.html
  */
@@ -209,8 +209,9 @@ public class LetterIndexView extends View {
         for (String letter : letters) {
             float centerY = currentYPosition + textHeight / 2;
             float y = centerY - (mTextPaint.ascent() + mTextPaint.descent()) / 2;
+            RectF bounds = new RectF(0, centerY - textHeight / 2, getWidth(), centerY + textHeight / 2);
+            letterPositions.add(new LetterPosition(x, y, letter, centerY, bounds));
             currentYPosition += (textHeight + space);
-            letterPositions.add(new LetterPosition(x, y, letter, centerY));
         }
         mCurrentSelectedLetterPosition = letterPositions.get(0);
         return letterPositions;
@@ -288,8 +289,7 @@ public class LetterIndexView extends View {
     private void findCurrentLetter(float y, float x, List<LetterPosition> letterPositionList, float textHeight) {
         for (int i = 0; i < letterPositionList.size(); i++) {
             LetterPosition letterPosition = letterPositionList.get(i);
-            RectF rect = new RectF(0, letterPosition.centerY - textHeight / 2, getWidth(), letterPosition.centerY + textHeight / 2);
-            if (rect.contains(x, y)) {
+            if (letterPosition.mBounds.contains(x, y)) {
                 if (mCurrentSelectedLetterPosition != letterPosition) {
                     if (mLetterSelectedListener != null) {
                         mLetterSelectedListener.onLetterSelectedChange(mCurrentSelectedLetterPosition != null ? mCurrentSelectedLetterPosition.letter : ""
@@ -321,12 +321,14 @@ public class LetterIndexView extends View {
         private final float y;
         private final String letter;
         private final float centerY;//中心位置，可用来绘制背景
+        private final RectF mBounds;//字母绘制的边界
 
-        public LetterPosition(float x, float y, String letter, float centerY) {
+        public LetterPosition(float x, float y, String letter, float centerY, RectF bounds) {
             this.x = x;
             this.y = y;
             this.letter = letter;
             this.centerY = centerY;
+            this.mBounds = bounds;
         }
     }
 }
