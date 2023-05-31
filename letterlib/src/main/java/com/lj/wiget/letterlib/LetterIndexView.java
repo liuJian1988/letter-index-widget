@@ -1,6 +1,7 @@
 package com.lj.wiget.letterlib;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,12 +14,29 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author： LJ
  * @data: 2022/04/06
  * @email： 1187502892@qq.com
+ * <p>
+ * <p>
+ * 设置样式：
+ * //1、设置字体大小
+ * mLetterId.setTextSize(30);
+ * //2、设置选中后背景padding
+ * mLetterId.setBgPadding(2);
+ * //3、设置选中背景颜色
+ * mLetterId.setSelectedBgColor(Color.CYAN);
+ * //4、设置字母颜色
+ * mLetterId.setLetterSelectedColor(Color.YELLOW)
+ * .setLetterUnSelectedColor(Color.DKGRAY);
+ * <p>
+ * <p>
+ * 控制目前只支持单个字符，纵向排列，如需扩展重新控件，或者使用 View组合的方式。
+ * 目前控件是通过单View绘制的方式实现，性能好。如果想要更加灵活，建议使用 View组合的方式实现
  * <p>
  * 控件编写的难点：
  * 1、如何是文字居中显示：https://www.cnblogs.com/tianzhijiexian/p/4297664.html
@@ -27,13 +45,13 @@ public class LetterIndexView extends View {
     /**
      * 定义默认值
      */
-    private final float DEFAULT_TEXT_SIZE = 30;
-    private final float DEFAULT_BG_PADDING = 3;
+    private final int DEFAULT_TEXT_SIZE = 30;
+    private final int DEFAULT_BG_PADDING = 3;
     private final int DEFAULT_SELECTED_TEXT_COLOR = Color.WHITE;
     private final int DEFAULT_UNSELECTED_TEXT_COLOR = Color.GRAY;
     private final int DEFAULT_BG_COLOR = Color.RED;
     private final int DEFAULT_MIN_SPACE = 10;
-    private final int DEFAULT_MAX_SPACE = 20;
+    private final int DEFAULT_MAX_SPACE = 50;
 
     private final Paint mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint mBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -50,16 +68,18 @@ public class LetterIndexView extends View {
     /**
      * 字母相对背景的padding，这个值只会决定bg的大小
      */
-    private float bgPadding = DEFAULT_BG_PADDING;
+    private float mBgPadding;
 
-    private float mTextSize = DEFAULT_TEXT_SIZE;
+    private float mTextSize;
+
+    private float mLetterSpaceBetween;
 
     /**
      * 文字选中和非选中状态下的颜色
      */
-    private int mSelectedTextColor = DEFAULT_SELECTED_TEXT_COLOR;
-    private int mUnSelectedTextColor = DEFAULT_UNSELECTED_TEXT_COLOR;
-    private int mBgColor = DEFAULT_BG_COLOR;
+    private int mSelectedTextColor;
+    private int mUnSelectedTextColor;
+    private int mSelectedBgColor;
 
     private OnLetterSelectedListener mLetterSelectedListener;// 字母选中监听
 
@@ -73,17 +93,68 @@ public class LetterIndexView extends View {
 
     public LetterIndexView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initSelf(context, attrs);
+        initSelf(context, attrs, defStyleAttr);
     }
 
-    private void initSelf(Context context, AttributeSet attrs) {
+    private void checkLetterSpaceBetween(float mLetterSpaceBetween) {
+        if (mLetterSpaceBetween < DEFAULT_MIN_SPACE) {
+            mLetterSpaceBetween = DEFAULT_MIN_SPACE;
+            return;
+        }
+        if (mLetterSpaceBetween > DEFAULT_MAX_SPACE) {
+            mLetterSpaceBetween = DEFAULT_MAX_SPACE;
+            return;
+        }
+
+    }
+
+    private void initSelf(Context context, AttributeSet attrs, int defStyleAttr) {
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.LetterIndexView, defStyleAttr, 0);
+        mTextSize = a.getDimensionPixelSize(R.styleable.LetterIndexView_textSize, DEFAULT_TEXT_SIZE);
+        mBgPadding = a.getDimensionPixelSize(R.styleable.LetterIndexView_letterPadding, DEFAULT_BG_PADDING);
+        mSelectedBgColor = a.getColor(R.styleable.LetterIndexView_letterSelectedBgColor, DEFAULT_BG_COLOR);
+        mSelectedTextColor = a.getColor(R.styleable.LetterIndexView_letterSelectedColor, DEFAULT_SELECTED_TEXT_COLOR);
+        mUnSelectedTextColor = a.getColor(R.styleable.LetterIndexView_unSelectedLetterColor, DEFAULT_UNSELECTED_TEXT_COLOR);
+        mLetterSpaceBetween = a.getDimensionPixelSize(R.styleable.LetterIndexView_letterSpaceBetween, DEFAULT_MIN_SPACE);
+        checkLetterSpaceBetween(mLetterSpaceBetween);
+        a.recycle();
         mTextPaint.setTextSize(mTextSize);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int height = computeMyRequestHeight();
+        int width = computeMyRequestWidth();
+        setMeasuredDimension(resolveSize(width, widthMeasureSpec),
+                resolveSize(height, heightMeasureSpec));
+    }
+
+    private int computeMyRequestWidth() {
+        if (mLetters.size() <= 0) {
+            return 0;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String letter : mLetters) {
+            stringBuilder.append(letter);
+
+        }
+        float[] widths = new float[mLetters.size()];
+        mTextPaint.getTextWidths(stringBuilder.toString(), widths);
+        Arrays.sort(widths);
+        float padding = getPaddingStart() + getPaddingEnd();
+        return (int) (widths[widths.length - 1] + padding + 0.5);
+    }
+
+    private int computeMyRequestHeight() {
+        if (mLetters.size() <= 0) {
+            return 0;
+        }
+        float singleTextHeight = mTextPaint.getFontMetrics().descent - mTextPaint.getFontMetrics().ascent;
+        float textHeight = mLetters.size() * singleTextHeight;
+        float space = (mLetters.size() - 1) * mLetterSpaceBetween;
+        float padding = getPaddingTop() + getPaddingBottom();
+        return (int) (textHeight + space + padding + 0.5);
     }
 
     @Override
@@ -113,12 +184,13 @@ public class LetterIndexView extends View {
     }
 
     /**
-     * 设置选中后背景中字母的padding
+     * 设置选中后背景中字母的padding,如果不设置，那么背景正好包裹。
+     * 设置后，背景的半径 = padding+文字宽度/2；
      *
      * @param padding
      */
     public LetterIndexView setBgPadding(int padding) {
-        this.bgPadding = TypedValue.applyDimension(
+        this.mBgPadding = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 padding,
                 getResources().getDisplayMetrics());
@@ -134,8 +206,8 @@ public class LetterIndexView extends View {
      *
      * @param color
      */
-    public LetterIndexView setBgColor(int color) {
-        this.mBgColor = color;
+    public LetterIndexView setSelectedBgColor(int color) {
+        this.mSelectedBgColor = color;
         if (getHeight() > 0) {
             // 只需要重新绘制，不需要重新计算大小
             postInvalidateOnAnimation();
@@ -144,7 +216,7 @@ public class LetterIndexView extends View {
     }
 
     /**
-     * 设置选中字母颜色
+     * 设置选中后文字的颜色
      *
      * @param color
      */
@@ -190,9 +262,9 @@ public class LetterIndexView extends View {
         mTextHeight = mTextPaint.getFontMetrics().descent - mTextPaint.getFontMetrics().ascent;
         //根据尺寸计算 字母的排列位置，根据字母大小和垂直方向间隔
         // 1、确定字母之间的间隔，根据高度计算字母间隔，
-        double space = computeSpace(mTextHeight, miniSpace, mLetters.size(), maxSpace);
+//        double space = computeSpace(mTextHeight, miniSpace, mLetters.size(), maxSpace);
         //2、计算每个字母的绘制位置
-        mLetterPositionList = computeLetterPosition(space, mTextHeight, getWidth() / 2, mLetters);
+        mLetterPositionList = computeLetterPosition(mLetterSpaceBetween, mTextHeight, getWidth() / 2, mLetters);
     }
 
     /**
@@ -201,11 +273,7 @@ public class LetterIndexView extends View {
     private List<LetterPosition> computeLetterPosition(double space, float textHeight, int x, List<String> letters) {
         List<LetterPosition> letterPositions = new ArrayList<>();
         // 让字母布局尽量剧中显示
-        double letterViewHeight = textHeight * letters.size() + space * (letters.size() - 1);
         int currentYPosition = getPaddingTop();
-        if (letterViewHeight <= getHeight()) {
-            currentYPosition = (int) ((getHeight() - letterViewHeight) / 2 + 0.5);
-        }
         for (String letter : letters) {
             float centerY = currentYPosition + textHeight / 2;
             float y = centerY - (mTextPaint.ascent() + mTextPaint.descent()) / 2;
@@ -217,27 +285,27 @@ public class LetterIndexView extends View {
         return letterPositions;
     }
 
-    /**
-     * 计算字母垂直间隔
-     *
-     * @param textHeight
-     * @param letterCount
-     * @param miniSpace
-     * @param maxSpace
-     * @return
-     */
-    private double computeSpace(float textHeight, int letterCount, int miniSpace, int maxSpace) {
-        if (letterCount <= 1) {
-            return 0;
-        }
-        double space = (getHeight() - (textHeight * letterCount + getPaddingTop() + getPaddingBottom())) / (letterCount - 1);
-        if (space < miniSpace) {
-            space = miniSpace;
-        } else if (space > maxSpace) {
-            space = maxSpace;
-        }
-        return space;
-    }
+//    /**
+//     * 计算字母垂直间隔
+//     *
+//     * @param textHeight
+//     * @param letterCount
+//     * @param miniSpace
+//     * @param maxSpace
+//     * @return
+//     */
+//    private double computeSpace(float textHeight, int letterCount, int miniSpace, int maxSpace) {
+//        if (letterCount <= 1) {
+//            return 0;
+//        }
+//        double space = (getHeight() - (textHeight * letterCount + getPaddingTop() + getPaddingBottom())) / (letterCount - 1);
+//        if (space < miniSpace) {
+//            space = miniSpace;
+//        } else if (space > maxSpace) {
+//            space = maxSpace;
+//        }
+//        return space;
+//    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -252,8 +320,8 @@ public class LetterIndexView extends View {
         if (letterPosition == null) {
             return;
         }
-        mBgPaint.setColor(mBgColor);
-        canvas.drawCircle(letterPosition.x, letterPosition.centerY, textHeight / 2 + bgPadding, mBgPaint);
+        mBgPaint.setColor(mSelectedBgColor);
+        canvas.drawCircle(letterPosition.x, letterPosition.centerY, textHeight / 2 + mBgPadding, mBgPaint);
     }
 
     private void drawLetter(List<LetterPosition> letterPositionList, Canvas canvas) {

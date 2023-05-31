@@ -38,11 +38,19 @@
 
         <com.lj.wiget.letterlib.LetterIndexView
             android:id="@+id/letter_id"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:paddingHorizontal="5dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="10dp"
-            android:background="@color/design_default_color_secondary"
-            android:paddingVertical="20dp" />
+            android:background="@drawable/letter_layout_bg"
+            android:paddingVertical="20dp"
+            app:letterPadding="2dp"
+            app:letterSelectedBgColor="@color/purple_200"
+            app:letterSelectedColor="@color/black"
+            app:letterSpaceBetween="20dp"
+            app:textSize="20dp"
+            app:unSelectedLetterColor="@color/white" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

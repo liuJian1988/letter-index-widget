@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LetterIndexView">
+        <attr name="textSize" format="dimension" />
+        <attr name="letterSelectedColor" format="color" />
+        <attr name="unSelectedLetterColor" format="color" />
+        <attr name="letterSelectedBgColor" format="color" />
+        <attr name="letterPadding" format="dimension" />
+        <attr name="letterSpaceBetween" format="dimension" />
+    </declare-styleable>
+</resources>

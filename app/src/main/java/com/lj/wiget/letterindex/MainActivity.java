@@ -1,6 +1,5 @@
 package com.lj.wiget.letterindex;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -30,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
                 mTvMsg.setText(oldLetter + "  " + newLetter + " " + index);
                 mTvLetterTip.setVisibility(View.VISIBLE);
                 mTvLetterTip.setText(newLetter);
-                mTvLetterTip.setTranslationY((float) (centerY-mTvLetterTip.getWidth()/2));
+                float tipPosition = (float) (mLetterId.getTop() + centerY - mTvLetterTip.getHeight() / 2);
+                mTvLetterTip.setTranslationY(tipPosition);
             }
 
             @Override
@@ -39,17 +39,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // 设置数据源
-        mLetterId.setLetterDataAndRefresh(Arrays.asList("上", "天", "揽", "明", "月", "下", "海", "捉", "老", "憋"));
-
-        /** 设置样式 **/
-        //1、设置字体大小
-        mLetterId.setTextSize(30);
-        //2、设置选中后背景padding
-        mLetterId.setBgPadding(2);
-        //3、设置选中背景颜色
-        mLetterId.setBgColor(Color.CYAN);
-        //4、设置字母颜色
-        mLetterId.setLetterSelectedColor(Color.YELLOW)
-                .setLetterUnSelectedColor(Color.DKGRAY);
+        mLetterId.setLetterDataAndRefresh(Arrays.asList("A", "上", "天", "揽", "明", "月", "下", "海", "捉", "老", "憋"));
     }
 }
