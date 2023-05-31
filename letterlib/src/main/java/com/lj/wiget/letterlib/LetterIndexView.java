@@ -56,14 +56,14 @@ public class LetterIndexView extends View {
     private final Paint mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint mBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private float mTextHeight = 0;// 文字的高度
-    private List<String> mLetters = new ArrayList<>();// 原始字母列表
+    private final List<String> mLetters = new ArrayList<>();// 原始字母列表
     private List<LetterPosition> mLetterPositionList = new ArrayList<>();// 记录字母的位置
     private LetterPosition mCurrentSelectedLetterPosition;//当前选中的item
-    /**
-     * 字母 垂直方向间隔是在 "miniSpace～maxSpace" 之间，实际间隔根据控件本身空间大小决定
-     */
-    private int miniSpace = DEFAULT_MIN_SPACE;// 最小间隔
-    private int maxSpace = DEFAULT_MAX_SPACE;// 最大间隔
+//    /**
+//     * 字母 垂直方向间隔是在 "miniSpace～maxSpace" 之间，实际间隔根据控件本身空间大小决定
+//     */
+//    private final int miniSpace = DEFAULT_MIN_SPACE;// 最小间隔
+//    private final int maxSpace = DEFAULT_MAX_SPACE;// 最大间隔
 
     /**
      * 字母相对背景的padding，这个值只会决定bg的大小
@@ -178,7 +178,7 @@ public class LetterIndexView extends View {
         mTextPaint.setTextSize(mTextSize);
         if (getHeight() > 0) {
             layoutLetter();
-            postInvalidateOnAnimation();
+            requestLayout();
         }
         return this;
     }
@@ -253,7 +253,7 @@ public class LetterIndexView extends View {
         mLetters.addAll(letters);
         if (getHeight() > 0) {
             layoutLetter();
-            postInvalidateOnAnimation();
+            requestLayout();
         }
     }
 

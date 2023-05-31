@@ -1,36 +1,55 @@
 # LetterIndexWiget
 
-#### 介绍
-字母索引控件，仿小米联系人字母列表
+#### 1、介绍
+字母索引控件，仿小米联系人字母列表，控件代码超级简单，很适合学习，为二次开发提供思路。
 
-#### 软件架构
-软件架构说明
+#### 2、使用方法
 
-#### 安装教程
+使用源码引入的方式，方便修改，将`letterlib` 引入到项目中，通过 `xml` 属性的方式设置控件
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```xml
+        <com.lj.wiget.letterlib.LetterIndexView
+            android:id="@+id/letter_id"
+            android:layout_width="wrap_content"
+            android:paddingHorizontal="5dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/letter_layout_bg"
+            android:paddingVertical="20dp"
+            app:letterPadding="2dp"
+            app:letterSelectedBgColor="@color/purple_200"
+            app:letterSelectedColor="@color/black"
+            app:letterSpaceBetween="20dp"
+            app:textSize="20dp"
+            app:unSelectedLetterColor="@color/white" />
+```
 
-#### 使用说明
+也可以使用 `java` 原生代码进行设置，上面的属性，都有对应的相应的方法设置。
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+如何监听，选中状态呢？
 
-#### 参与贡献
+```java
+        // 设置监听
+        mLetterId.setOnLetterSelectedListener(new LetterIndexView.OnLetterSelectedListener() {
+            @Override
+            public void onLetterSelectedChange(String oldLetter, String newLetter, int index, double centerY) {
+                mTvMsg.setText(oldLetter + "  " + newLetter + " " + index);
+                mTvLetterTip.setVisibility(View.VISIBLE);
+                mTvLetterTip.setText(newLetter);
+                float tipPosition = (float) (mLetterId.getTop() + centerY - mTvLetterTip.getHeight() / 2);
+                mTvLetterTip.setTranslationY(tipPosition);
+            }
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+            @Override
+            public void onLetterUp() {
+                mTvLetterTip.setVisibility(View.GONE);
+            }
+        });
+        // 设置数据源
+        mLetterId.setLetterDataAndRefresh(Arrays.asList("A", "上", "天", "揽", "明", "月", "下", "海", "捉", "老", "憋"));
+
+```
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
