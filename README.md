@@ -52,6 +52,7 @@
         mLetterId.setLetterDataAndRefresh(Arrays.asList("A", "上", "天", "揽", "明", "月", "下", "海", "捉", "老", "憋"));
 
 ```
+欢迎大家提问题哦，我的微信：liujianlhy。 可以定制安卓控件，有需要联系哦。
 
 
 
